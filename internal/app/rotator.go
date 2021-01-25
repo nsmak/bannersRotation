@@ -39,3 +39,9 @@ func (r *RotatorDomain) RemoveBannerFromSlot(ctx context.Context, bannerID, slot
 
 	return nil
 }
+
+func (r *RotatorDomain) BannerIDForSlot(slotID, socDemGrpID int64) (int64, error) {
+	return 0, nil
+}
+
+// клики / показы + ... остальное по формуле
