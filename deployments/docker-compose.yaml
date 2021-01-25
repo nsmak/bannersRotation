@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  db:
+    image: postgres:12-alpine
+    restart: always
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    networks:
+      rotator:
+        aliases:
+          - db
+    environment:
+      POSTGRES_PASSWORD: password
+    ports:
+      - '5432:5432'
+
+  db_migrations:
+    build:
+      context: ..
+      dockerfile: ./deployments/migrations/Dockerfile
+    depends_on:
+      - db
+    networks:
+      - rotator
+
+volumes:
+  dbdata:
+
+networks:
+  rotator:
+    external:
+      name: rotator_network
