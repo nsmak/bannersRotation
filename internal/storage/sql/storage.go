@@ -70,6 +70,15 @@ func (s *BannerDataStore) AddBannerToSlot(ctx context.Context, bannerID, slotID 
 }
 
 func (s *BannerDataStore) RemoveBannerFromSlot(ctx context.Context, bannerID, slotID int64) error {
+	slotIsExist, err := s.slotIsExist(ctx, slotID)
+	if err != nil {
+		return storage.NewError("can't get info about slot", err)
+	}
+
+	if !slotIsExist {
+		return storage.ErrSlotNotFound
+	}
+
 	bannerIsExist, err := s.bannerIsExistInSlot(ctx, bannerID, slotID)
 	if err != nil {
 		return storage.NewError("can't get info about banner in slot", err)
@@ -79,7 +88,7 @@ func (s *BannerDataStore) RemoveBannerFromSlot(ctx context.Context, bannerID, sl
 		return storage.ErrBannerInSlotNotFound
 	}
 
-	_, err = s.db.ExecContext(ctx, "DELETE FROM banner_slot WHERE banner_id=$1 && slot_id=$2", bannerID, slotID)
+	_, err = s.db.ExecContext(ctx, "DELETE FROM banner_slot WHERE banner_id=$1 AND slot_id=$2", bannerID, slotID)
 	if err != nil {
 		return storage.NewError("can't remove banner from slot", err)
 	}
@@ -120,7 +129,7 @@ func (s *BannerDataStore) bannerIsExistInSlot(ctx context.Context, bannerID, slo
 
 	err := s.db.GetContext(
 		ctx,
-		&count, "SELECT COUNT(*) FROM banner_slot WHERE banner_id=$1 && slot_id=$2", bannerID, slotID,
+		&count, "SELECT COUNT(*) FROM banner_slot WHERE banner_id=$1 AND slot_id=$2", bannerID, slotID,
 	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
