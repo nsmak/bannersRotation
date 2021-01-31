@@ -23,7 +23,30 @@ stop)
   docker volume rm $DOCKER_VOLUME
   ;;
 
+test)
+    echo Creating network $DOCKER_NETWORK
+  	docker network create $DOCKER_NETWORK
+
+  	echo Deploying project
+  	docker-compose -f deployments/docker-compose.yaml up -d --build
+  	sleep 10
+
+  	echo Deploying tests
+  	docker-compose -f deployments/docker-compose-tests.yaml up --build
+  	rc=$?
+
+  	echo Stopping project and tests
+  	docker-compose -f deployments/docker-compose.yaml -f deployments/docker-compose-tests.yaml down
+
+  	echo Removing docker network $DOCKER_NETWORK
+    docker network rm $DOCKER_NETWORK
+
+  	echo Removing docker volume $DOCKER_VOLUME
+    docker volume rm $DOCKER_VOLUME
+  	 exit $rc
+  	 ;;
 *)
-  echo Usage ./deploy.sh up|down
+
+  echo Usage ./deploy.sh run|stop|test
   ;;
 esac
