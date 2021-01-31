@@ -27,13 +27,26 @@ CREATE TABLE IF NOT EXISTS banner_slot (
         REFERENCES slot (id)
 );
 
-CREATE TABLE IF NOT EXISTS statistics (
+CREATE TABLE IF NOT EXISTS banner_showing (
     banner_id numeric(5) NOT NULL,
     slot_id numeric(5) NOT NULL,
     social_id numeric(5) NOT NULL,
-    view_count integer NOT NULL DEFAULT 0,
-    click_count integer NOT NULL DEFAULT 0,
-    PRIMARY KEY (banner_id, slot_id, social_id),
+    date timestamptz NOT NULL DEFAULT current_timestamp,
+    PRIMARY KEY (banner_id, slot_id, social_id, date),
+    FOREIGN KEY (banner_id)
+        REFERENCES banner (id),
+    FOREIGN KEY (slot_id)
+        REFERENCES slot (id),
+    FOREIGN KEY (social_id)
+        REFERENCES social_dem (id)
+);
+
+CREATE TABLE IF NOT EXISTS banner_click (
+    banner_id numeric(5) NOT NULL,
+    slot_id numeric(5) NOT NULL,
+    social_id numeric(5) NOT NULL,
+    date timestamptz NOT NULL DEFAULT current_timestamp,
+    PRIMARY KEY (banner_id, slot_id, social_id, date),
     FOREIGN KEY (banner_id)
         REFERENCES banner (id),
     FOREIGN KEY (slot_id)
@@ -51,4 +64,5 @@ drop table banner;
 drop table slot;
 drop table social_dem;
 drop table banner_slot;
-drop table statistics;
+drop table banner_showing;
+drop table banner_click;

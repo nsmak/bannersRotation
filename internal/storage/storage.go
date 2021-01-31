@@ -7,6 +7,8 @@ var (
 	ErrSlotNotFound             = NewError("slot not found", nil)
 	ErrBannerInSlotNotFound     = NewError("banner in slot not found", nil)
 	ErrBannerInSlotAlreadyExist = NewError("banner in slot already exist", nil)
+	ErrSocialGroupNotFound      = NewError("social group not found", nil)
+	ErrStatisticsNotFound       = NewError("statistics not found", nil)
 )
 
 type Error struct {
