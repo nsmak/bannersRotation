@@ -20,5 +20,5 @@
     "address": "db:5432",
     "db_name": "postgres"
   },
-  "interval_in_sec": 5
+  "interval_in_sec": 10
 }
