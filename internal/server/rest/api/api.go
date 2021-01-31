@@ -17,6 +17,12 @@ type BannerSlotForm struct {
 }
 
 type BannerForSlotForm struct {
+	SlotID   int64 `schema:"slot_id"`
+	SocDemID int64 `schema:"soc_dem_id"`
+}
+
+type BannerClickFrom struct {
+	BannerID int64 `json:"banner_id"`
 	SlotID   int64 `json:"slot_id"`
 	SocDemID int64 `json:"soc_dem_id"`
 }
@@ -57,7 +63,7 @@ func (a *API) removeBannerFromSlot(w http.ResponseWriter, r *http.Request) {
 
 	if err := a.rotator.RemoveBannerFromSlot(r.Context(), form.BannerID, form.SlotID); err != nil {
 		statusCode := http.StatusBadRequest
-		if errors.Is(err, storage.ErrBannerInSlotNotFound) {
+		if errors.Is(err, storage.ErrSlotNotFound) || errors.Is(err, storage.ErrBannerInSlotNotFound) {
 			statusCode = http.StatusNotFound
 		}
 		rest.SendErrorJSON(w, r, statusCode, err, "can't update event")
@@ -70,17 +76,43 @@ func (a *API) removeBannerFromSlot(w http.ResponseWriter, r *http.Request) {
 func (a *API) bannerForSlot(w http.ResponseWriter, r *http.Request) {
 	var query BannerForSlotForm
 	if err := schema.NewDecoder().Decode(&query, r.URL.Query()); err != nil {
-		rest.SendErrorJSON(w, r, http.StatusBadRequest, err, "can't query params")
+		rest.SendErrorJSON(w, r, http.StatusBadRequest, err, "can't get query params")
 		return
 	}
 
-	bannerID, err := a.rotator.BannerIDForSlot(query.SlotID, query.SocDemID)
+	bannerID, err := a.rotator.BannerIDForSlot(r.Context(), query.SlotID, query.SocDemID)
 	if err != nil {
-		rest.SendErrorJSON(w, r, http.StatusBadRequest, err, "can't get banner id")
+		statusCode := http.StatusBadRequest
+		if errors.Is(err, storage.ErrSlotNotFound) || errors.Is(err, storage.ErrSocialGroupNotFound) ||
+			errors.Is(err, storage.ErrStatisticsNotFound) {
+			statusCode = http.StatusNotFound
+		}
+		rest.SendErrorJSON(w, r, statusCode, err, "can't get banner id")
 		return
 	}
 
 	rest.SendDataJSON(w, r, http.StatusOK, rest.JSON{"banner_id": bannerID})
+}
+
+func (a *API) addCLickForBanner(w http.ResponseWriter, r *http.Request) {
+	var form BannerClickFrom
+	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
+		rest.SendErrorJSON(w, r, http.StatusBadRequest, err, "can't parse")
+		return
+	}
+
+	err := a.rotator.AddClickForBanner(r.Context(), form.BannerID, form.SlotID, form.SocDemID)
+	if err != nil {
+		statusCode := http.StatusBadRequest
+		if errors.Is(err, storage.ErrSlotNotFound) || errors.Is(err, storage.ErrBannerInSlotNotFound) ||
+			errors.Is(err, storage.ErrSocialGroupNotFound) {
+			statusCode = http.StatusNotFound
+		}
+		rest.SendErrorJSON(w, r, statusCode, err, "can't get banner id")
+		return
+	}
+
+	rest.SendDataJSON(w, r, http.StatusOK, nil)
 }
 
 func (a *API) Routes() []rest.Route {
@@ -100,8 +132,14 @@ func (a *API) Routes() []rest.Route {
 		{
 			Name:   "BannerForSlot",
 			Method: http.MethodGet,
-			Path:   "/slot/banner",
+			Path:   "/banner",
 			Func:   a.bannerForSlot,
+		},
+		{
+			Name:   "ClickForBanner",
+			Method: http.MethodPost,
+			Path:   "/banner/click/add",
+			Func:   a.addCLickForBanner,
 		},
 	}
 }
