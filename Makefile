@@ -14,4 +14,10 @@ stop:
 	sh ./deployments/deploy.sh stop
 
 test:
+	go test -race ./internal/...
+
+integration-tests:
 	sh ./deployments/deploy.sh test
+
+lint:
+	golangci-lint run ./...
