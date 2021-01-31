@@ -1,4 +1,4 @@
-# Banners Rotation  [![Build Status](https://travis-ci.org/{ORG-or-USERNAME}/{REPO-NAME}.png?branch=master)](https://travis-ci.org/{ORG-or-USERNAME}/{REPO-NAME}) [![Go Report Card](https://goreportcard.com/badge/github.com/nsmak/bannersRotation)](https://goreportcard.com/report/github.com/nsmak/bannersRotation)
+# Banners Rotation [![Build Status](https://travis-ci.com/nsmak/bannersRotation.svg?branch=master)](https://travis-ci.com/nsmak/bannersRotation) [![Go Report Card](https://goreportcard.com/badge/github.com/nsmak/bannersRotation)](https://goreportcard.com/report/github.com/nsmak/bannersRotation)
 
 Banner rotation service, based on  UCB1 algorithm (multiarmed bandit).
 
@@ -74,6 +74,6 @@ $ make build-statistic
     "address": "db:5432",
     "db_name": "postgres"
   },
-  "interval_in_sec": 5
+  "interval_in_sec": 60
 }
 ```
