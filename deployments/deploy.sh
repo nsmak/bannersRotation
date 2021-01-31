@@ -1,15 +1,26 @@
 #!/bin/sh
 
+DOCKER_NETWORK=rotator_network
+DOCKER_VOLUME=deployments_dbdata
+
 case "$1" in
-up)
-  docker network create rotator_network
+run)
+  echo Creating network $DOCKER_NETWORK
+  docker network create $DOCKER_NETWORK
+
+  echo Deploying project
   docker-compose -f deployments/docker-compose.yaml up -d --build
   ;;
 
-down)
+stop)
+  echo Stopping project
   docker-compose -f deployments/docker-compose.yaml down
-  docker network rm rotator_network
-  docker volume rm deployments_dbdata
+
+  echo Removing docker network $DOCKER_NETWORK
+  docker network rm $DOCKER_NETWORK
+
+  echo Removing docker volume $DOCKER_VOLUME
+  docker volume rm $DOCKER_VOLUME
   ;;
 
 *)

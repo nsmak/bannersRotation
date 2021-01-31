@@ -7,7 +7,7 @@ services:
     volumes:
       - dbdata:/var/lib/postgresql/data
     networks:
-      rotator:
+      rot:
         aliases:
           - db
     environment:
@@ -22,12 +22,26 @@ services:
     depends_on:
       - db
     networks:
-      - rotator
+      - rot
+
+  rotator:
+    build:
+      context: ..
+      dockerfile: ./deployments/rotator/Dockerfile
+    depends_on:
+      - db_migrations
+    restart: always
+    networks:
+      rot:
+        aliases:
+          - rotator
+    ports:
+      - '8888:8888'
 
 volumes:
   dbdata:
 
 networks:
-  rotator:
+  rot:
     external:
       name: rotator_network

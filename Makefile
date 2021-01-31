@@ -1,5 +1,5 @@
 run:
-	sh ./deployments/deploy.sh up
+	sh ./deployments/deploy.sh run
 
 stop:
-	sh ./deployments/deploy.sh down
+	sh ./deployments/deploy.sh stop
