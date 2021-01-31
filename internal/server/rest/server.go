@@ -12,19 +12,12 @@ import (
 	"github.com/nsmak/bannersRotation/internal/app"
 )
 
-type ServerError struct { // TODO: - переделать!
-	Message string `json:"message"`
-	Err     error  `json:"err,omitempty"`
+type serverError struct {
+	app.BaseError
 }
 
-func (e *ServerError) Error() string {
-	if e.Err != nil {
-		e.Message = e.Message + " --> " + e.Err.Error()
-	}
-	return e.Message
-}
-func (e *ServerError) Unwrap() error {
-	return e.Err
+func newServerError(msg string, err error) *serverError {
+	return &serverError{BaseError: app.BaseError{Message: msg, Err: err}}
 }
 
 type Server struct {
@@ -52,7 +45,7 @@ func (s *Server) Start(ctx context.Context) error {
 
 	err := s.server.ListenAndServe()
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
-		return &ServerError{Message: "start server error", Err: err}
+		return newServerError("start server error", err)
 	}
 
 	<-ctx.Done()
@@ -61,11 +54,11 @@ func (s *Server) Start(ctx context.Context) error {
 
 func (s *Server) Stop(ctx context.Context) error {
 	if s.server == nil {
-		return &ServerError{Message: "server is nil"}
+		return newServerError("server is nil", nil)
 	}
 
 	if err := s.server.Shutdown(ctx); err != nil {
-		return &ServerError{Message: "stop server error", Err: err}
+		return newServerError("stop server error", err)
 	}
 	return nil
 }
