@@ -34,15 +34,13 @@ func (s *Statistic) Run(ctx context.Context) {
 func (s *Statistic) publishStatisticMessage(ctx context.Context) {
 	err := s.producer.OpenChannel()
 	if err != nil {
-		log.Println("can't open channel", err.Error()) // TODO:
-		// s.log.Error("can't open channel", s.log.String("msg", err.Error()))
+		s.log.Error("can't open channel", s.log.String("msg", err.Error()))
 		return
 	}
 	defer func() {
 		err := s.producer.CloseChannel()
 		if err != nil {
-			log.Println("can't close channel", err.Error()) // TODO:
-			// s.log.Error("can't close channel", s.log.String("msg", err.Error()))
+			s.log.Error("can't close channel", s.log.String("msg", err.Error()))
 		}
 	}()
 
