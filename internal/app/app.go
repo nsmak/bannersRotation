@@ -27,3 +27,10 @@ type Storage interface {
 	BannersShowStatisticsFilterByDate(ctx context.Context, from int64, to int64) ([]BannerStatistic, error)
 	BannersClickStatisticsFilterByDate(ctx context.Context, from int64, to int64) ([]BannerStatistic, error)
 }
+
+type MQProducer interface {
+	Publish(body []byte) error
+	OpenChannel() error
+	CloseChannel() error
+	CloseConn() error
+}

@@ -24,6 +24,19 @@ services:
     networks:
       - rot
 
+  mq:
+    image: rabbitmq:3-management-alpine
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      rot:
+        aliases:
+          - mq
+    ports:
+      - '5672:5672'
+
   rotator:
     build:
       context: ..
@@ -37,6 +50,19 @@ services:
           - rotator
     ports:
       - '8888:8888'
+
+  statistic:
+    build:
+      context: ..
+      dockerfile: ./deployments/statistic/Dockerfile
+    depends_on:
+      - db_migrations
+      - mq
+    networks:
+      rot:
+        aliases:
+          - statistic
+    restart: always
 
 volumes:
   dbdata:

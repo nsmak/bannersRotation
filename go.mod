@@ -9,6 +9,7 @@ require (
 	github.com/jackc/pgx/v4 v4.10.1
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/justinas/alice v1.2.0
+	github.com/streadway/amqp v1.0.0
 	github.com/stretchr/testify v1.5.1
 	go.uber.org/zap v1.16.0
 )

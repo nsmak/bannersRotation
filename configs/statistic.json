@@ -1,0 +1,24 @@
+{
+  "rabbit_mq": {
+    "host": "mq",
+    "port": "5672",
+    "username": "guest",
+    "password": "guest",
+    "exchange_name": "stat_exchange",
+    "exchange_type": "direct",
+    "queue_name": "stat_queue",
+    "routing_key": "stat_key",
+    "consumer_tag": "stat_tag"
+  },
+  "logger": {
+    "level": -1,
+    "file_path": "./statistic.log"
+  },
+  "database": {
+    "username": "postgres",
+    "password": "password",
+    "address": "db:5432",
+    "db_name": "postgres"
+  },
+  "interval_in_sec": 5
+}
