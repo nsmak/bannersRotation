@@ -6,10 +6,9 @@ package api_test
 
 import (
 	context "context"
-	reflect "reflect"
-
 	gomock "github.com/golang/mock/gomock"
 	app "github.com/nsmak/bannersRotation/internal/app"
+	reflect "reflect"
 )
 
 // MockStorage is a mock of Storage interface
@@ -75,6 +74,36 @@ func (m *MockStorage) AddViewForBanner(arg0 context.Context, arg1, arg2, arg3 in
 func (mr *MockStorageMockRecorder) AddViewForBanner(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddViewForBanner", reflect.TypeOf((*MockStorage)(nil).AddViewForBanner), arg0, arg1, arg2, arg3)
+}
+
+// BannersClickStatisticsFilterByDate mocks base method
+func (m *MockStorage) BannersClickStatisticsFilterByDate(arg0 context.Context, arg1, arg2 int64) ([]app.BannerStatistic, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BannersClickStatisticsFilterByDate", arg0, arg1, arg2)
+	ret0, _ := ret[0].([]app.BannerStatistic)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BannersClickStatisticsFilterByDate indicates an expected call of BannersClickStatisticsFilterByDate
+func (mr *MockStorageMockRecorder) BannersClickStatisticsFilterByDate(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BannersClickStatisticsFilterByDate", reflect.TypeOf((*MockStorage)(nil).BannersClickStatisticsFilterByDate), arg0, arg1, arg2)
+}
+
+// BannersShowStatisticsFilterByDate mocks base method
+func (m *MockStorage) BannersShowStatisticsFilterByDate(arg0 context.Context, arg1, arg2 int64) ([]app.BannerStatistic, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BannersShowStatisticsFilterByDate", arg0, arg1, arg2)
+	ret0, _ := ret[0].([]app.BannerStatistic)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// BannersShowStatisticsFilterByDate indicates an expected call of BannersShowStatisticsFilterByDate
+func (mr *MockStorageMockRecorder) BannersShowStatisticsFilterByDate(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BannersShowStatisticsFilterByDate", reflect.TypeOf((*MockStorage)(nil).BannersShowStatisticsFilterByDate), arg0, arg1, arg2)
 }
 
 // BannersStatistics mocks base method
