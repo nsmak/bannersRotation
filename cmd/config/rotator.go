@@ -33,8 +33,7 @@ type LoggerConf struct {
 }
 
 type RestConf struct {
-	Host string `json:"host"`
-	Port string `json:"port"`
+	Address string `json:"address"`
 }
 
 type DBConf struct {

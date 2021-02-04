@@ -45,7 +45,7 @@ func main() {
 	}
 
 	rotator := app.NewRotator(storage, logg)
-	server := rest.NewServer(api.New(rotator), cfg.RestServer.Host, cfg.RestServer.Port, logg)
+	server := rest.NewServer(api.New(rotator), cfg.RestServer.Address, logg)
 
 	go func() {
 		signals := make(chan os.Signal, 1)

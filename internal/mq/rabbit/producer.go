@@ -14,7 +14,7 @@ type Producer struct {
 }
 
 func NewProducer(cfg config.Rabbit) (*Producer, error) {
-	uri := fmt.Sprintf("amqp://%s:%s@%s:%s/", cfg.Username, cfg.Password, cfg.Host, cfg.Port)
+	uri := fmt.Sprintf("amqp://%s:%s@%s/", cfg.Username, cfg.Password, cfg.Address)
 	conn, err := amqp.Dial(uri)
 	if err != nil {
 		return nil, newError("can't connect to rmq", err)

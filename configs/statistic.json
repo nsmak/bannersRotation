@@ -1,7 +1,6 @@
 {
   "rabbit_mq": {
-    "host": "mq",
-    "port": "5672",
+    "address": "mq:5672",
     "username": "guest",
     "password": "guest",
     "exchange_name": "stat_exchange",
