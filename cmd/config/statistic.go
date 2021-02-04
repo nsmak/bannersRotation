@@ -7,8 +7,7 @@ import (
 )
 
 type Rabbit struct {
-	Host         string `json:"host"`
-	Port         string `json:"port"`
+	Address      string `json:"address"`
 	Username     string `json:"username"`
 	Password     string `json:"password"`
 	ExchangeName string `json:"exchange_name"`

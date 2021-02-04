@@ -3,7 +3,6 @@ package rest
 import (
 	"context"
 	"errors"
-	"net"
 	"net/http"
 	"time"
 
@@ -27,9 +26,9 @@ type Server struct {
 	log     app.Logger
 }
 
-func NewServer(public API, host, port string, logger app.Logger) *Server {
+func NewServer(public API, address string, logger app.Logger) *Server {
 	return &Server{
-		Address: net.JoinHostPort(host, port),
+		Address: address,
 		public:  public,
 		log:     logger,
 	}
