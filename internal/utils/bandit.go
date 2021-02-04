@@ -11,15 +11,19 @@ func PlayWithBandit(counts, rewards []int64) (index int, err error) {
 	}
 
 	sumCounts := sum(counts...)
-	values := make([]float64, len(counts))
+	maxValue := math.Inf(-1)
+	var maxValueIndex int
 
 	for i, count := range counts {
 		k := math.Sqrt((2.0 * math.Log(float64(sumCounts))) / float64(count))
 		val := (float64(rewards[i]) / float64(count)) + k
-		values[i] = val
+		if val > maxValue {
+			maxValue = val
+			maxValueIndex = i
+		}
 	}
 
-	return maxAt(values...), nil
+	return maxValueIndex, nil
 }
 
 func sum(values ...int64) int64 {
@@ -28,15 +32,4 @@ func sum(values ...int64) int64 {
 		total += v
 	}
 	return total
-}
-
-func maxAt(values ...float64) (index int) {
-	value := math.Inf(-1)
-	for i, v := range values {
-		if v > value {
-			value = v
-			index = i
-		}
-	}
-	return
 }

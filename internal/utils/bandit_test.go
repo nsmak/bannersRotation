@@ -55,30 +55,3 @@ func TestSumZero(t *testing.T) {
 
 	require.Equal(t, expected, s)
 }
-
-func TestMaxAt(t *testing.T) {
-	values := []float64{1, 2, 3}
-	var expected = 2
-
-	m := maxAt(values...)
-
-	require.Equal(t, expected, m)
-}
-
-func TestMaxAtWhenAllMax(t *testing.T) {
-	values := []float64{3, 3, 3}
-	var expected = 0
-
-	m := maxAt(values...)
-
-	require.Equal(t, expected, m)
-}
-
-func TestMaxAtWhenZero(t *testing.T) {
-	var values []float64
-	var expected = 0
-
-	m := maxAt(values...)
-
-	require.Equal(t, expected, m)
-}
