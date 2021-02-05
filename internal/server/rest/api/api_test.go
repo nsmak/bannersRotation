@@ -94,7 +94,7 @@ func (s *ApiSuite) TestAddBannerToSlotBannerNotFound() {
 
 	s.Require().NoError(err)
 
-	s.mockStore.EXPECT().AddBannerToSlot(s.ctx, form.BannerID, form.SlotID).Return(storage.ErrBannerNotFound)
+	s.mockStore.EXPECT().AddBannerToSlot(s.ctx, form.BannerID, form.SlotID).Return(storage.ErrObjectNotFound)
 	resp, err := http.Post(s.server.URL+"/slot/banner/add", "application/json", bytes.NewReader(data))
 
 	s.Require().NoError(err)
@@ -107,7 +107,7 @@ func (s *ApiSuite) TestAddBannerToSlotSlotNotFound() {
 
 	s.Require().NoError(err)
 
-	s.mockStore.EXPECT().AddBannerToSlot(s.ctx, form.BannerID, form.SlotID).Return(storage.ErrSlotNotFound)
+	s.mockStore.EXPECT().AddBannerToSlot(s.ctx, form.BannerID, form.SlotID).Return(storage.ErrObjectNotFound)
 	resp, err := http.Post(s.server.URL+"/slot/banner/add", "application/json", bytes.NewReader(data))
 
 	s.Require().NoError(err)
@@ -161,7 +161,7 @@ func (s *ApiSuite) TestRemoveBannerFromSlotSlotNotFound() {
 
 	s.Require().NoError(err)
 
-	s.mockStore.EXPECT().RemoveBannerFromSlot(s.ctx, form.BannerID, form.SlotID).Return(storage.ErrSlotNotFound)
+	s.mockStore.EXPECT().RemoveBannerFromSlot(s.ctx, form.BannerID, form.SlotID).Return(storage.ErrObjectNotFound)
 	resp, err := http.Post(s.server.URL+"/slot/banner/remove", "application/json", bytes.NewReader(data))
 
 	s.Require().NoError(err)
@@ -174,7 +174,7 @@ func (s *ApiSuite) TestRemoveBannerFromSlotBannerInSlotNotFound() {
 
 	s.Require().NoError(err)
 
-	s.mockStore.EXPECT().RemoveBannerFromSlot(s.ctx, form.BannerID, form.SlotID).Return(storage.ErrBannerInSlotNotFound)
+	s.mockStore.EXPECT().RemoveBannerFromSlot(s.ctx, form.BannerID, form.SlotID).Return(storage.ErrObjectNotFound)
 	resp, err := http.Post(s.server.URL+"/slot/banner/remove", "application/json", bytes.NewReader(data))
 
 	s.Require().NoError(err)
@@ -221,7 +221,7 @@ func (s *ApiSuite) TestBannerForSlotSlotNotFound() {
 		SocDemID: 1,
 	}
 
-	s.mockStore.EXPECT().BannersStatistics(s.ctx, query.SlotID, query.SocDemID).Return(nil, storage.ErrSlotNotFound)
+	s.mockStore.EXPECT().BannersStatistics(s.ctx, query.SlotID, query.SocDemID).Return(nil, storage.ErrObjectNotFound)
 	resp, err := http.Get(s.server.URL + fmt.Sprintf("/banner?slot_id=%d&soc_dem_id=%d", query.SlotID, query.SocDemID))
 
 	s.Require().NoError(err)
@@ -234,7 +234,7 @@ func (s *ApiSuite) TestBannerForSlotSocialGroupNotFound() {
 		SocDemID: 1,
 	}
 
-	s.mockStore.EXPECT().BannersStatistics(s.ctx, query.SlotID, query.SocDemID).Return(nil, storage.ErrSocialGroupNotFound)
+	s.mockStore.EXPECT().BannersStatistics(s.ctx, query.SlotID, query.SocDemID).Return(nil, storage.ErrObjectNotFound)
 	resp, err := http.Get(s.server.URL + fmt.Sprintf("/banner?slot_id=%d&soc_dem_id=%d", query.SlotID, query.SocDemID))
 
 	s.Require().NoError(err)
@@ -302,7 +302,7 @@ func (s *ApiSuite) TestAddCLickForBannerSlotNotFound() {
 
 	s.Require().NoError(err)
 
-	s.mockStore.EXPECT().AddClickForBanner(s.ctx, form.BannerID, form.SlotID, form.SocDemID).Return(storage.ErrSlotNotFound)
+	s.mockStore.EXPECT().AddClickForBanner(s.ctx, form.BannerID, form.SlotID, form.SocDemID).Return(storage.ErrObjectNotFound)
 	resp, err := http.Post(s.server.URL+"/banner/click/add", "application/json", bytes.NewReader(data))
 
 	s.Require().NoError(err)
@@ -315,7 +315,7 @@ func (s *ApiSuite) TestAddCLickForBannerBannerInSlotNotFound() {
 
 	s.Require().NoError(err)
 
-	s.mockStore.EXPECT().AddClickForBanner(s.ctx, form.BannerID, form.SlotID, form.SocDemID).Return(storage.ErrBannerInSlotNotFound)
+	s.mockStore.EXPECT().AddClickForBanner(s.ctx, form.BannerID, form.SlotID, form.SocDemID).Return(storage.ErrObjectNotFound)
 	resp, err := http.Post(s.server.URL+"/banner/click/add", "application/json", bytes.NewReader(data))
 
 	s.Require().NoError(err)
@@ -328,7 +328,7 @@ func (s *ApiSuite) TestAddCLickForBannerSocialGroupNotFound() {
 
 	s.Require().NoError(err)
 
-	s.mockStore.EXPECT().AddClickForBanner(s.ctx, form.BannerID, form.SlotID, form.SocDemID).Return(storage.ErrSocialGroupNotFound)
+	s.mockStore.EXPECT().AddClickForBanner(s.ctx, form.BannerID, form.SlotID, form.SocDemID).Return(storage.ErrObjectNotFound)
 	resp, err := http.Post(s.server.URL+"/banner/click/add", "application/json", bytes.NewReader(data))
 
 	s.Require().NoError(err)
