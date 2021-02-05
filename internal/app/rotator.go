@@ -64,11 +64,7 @@ func (r *RotatorDomain) BannerIDForSlot(ctx context.Context, slotID, socialID in
 		clicksCount[i] = s.ClickCount.Int64
 	}
 
-	index, err := utils.PlayWithBandit(showsCount, clicksCount)
-	if err != nil {
-		r.log.Error("play with bandit error", r.log.String("msg", err.Error()))
-		return 0, newError("play with bandit error", err)
-	}
+	index := utils.PlayWithBandit(showsCount, clicksCount)
 
 	bannerID := stats[index].BannerID
 
