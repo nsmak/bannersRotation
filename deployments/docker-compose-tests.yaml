@@ -5,12 +5,3 @@ services:
     build:
       context: ..
       dockerfile: ./deployments/tests/Dockerfile
-    networks:
-      rot:
-        aliases:
-          - db
-
-networks:
-  rot:
-    external:
-      name: rotator_network
