@@ -11,32 +11,30 @@ func TestPlayWithBandit(t *testing.T) {
 	rewards := []int64{1, 2, 1}
 	expected := 2
 
-	index, err := PlayWithBandit(counts, rewards)
+	var index int
 
-	require.NoError(t, err)
+	require.NotPanics(t, func() {
+		index = PlayWithBandit(counts, rewards)
+	})
 	require.Equal(t, expected, index)
 }
 
 func TestPlayWithBanditInvalidCounts(t *testing.T) {
 	counts := []int64{6, 7}
 	rewards := []int64{1, 2, 1}
-	expected := 0
 
-	index, err := PlayWithBandit(counts, rewards)
-
-	require.Error(t, err)
-	require.Equal(t, expected, index)
+	require.Panics(t, func() {
+		PlayWithBandit(counts, rewards)
+	})
 }
 
 func TestPlayWithBanditInvalidRewards(t *testing.T) {
 	counts := []int64{6, 7, 5}
 	rewards := []int64{1, 2, 1, 8}
-	expected := 0
 
-	index, err := PlayWithBandit(counts, rewards)
-
-	require.Error(t, err)
-	require.Equal(t, expected, index)
+	require.Panics(t, func() {
+		PlayWithBandit(counts, rewards)
+	})
 }
 
 func TestSum(t *testing.T) {

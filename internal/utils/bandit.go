@@ -1,13 +1,12 @@
 package utils
 
 import (
-	"errors"
 	"math"
 )
 
-func PlayWithBandit(counts, rewards []int64) (index int, err error) {
+func PlayWithBandit(counts, rewards []int64) (index int) {
 	if len(counts) != len(rewards) {
-		return 0, errors.New("invalid length of counts/rewards")
+		panic("\"counts\" length must be equal \"rewards\" length")
 	}
 
 	sumCounts := sum(counts...)
@@ -23,7 +22,7 @@ func PlayWithBandit(counts, rewards []int64) (index int, err error) {
 		}
 	}
 
-	return maxValueIndex, nil
+	return maxValueIndex
 }
 
 func sum(values ...int64) int64 {
