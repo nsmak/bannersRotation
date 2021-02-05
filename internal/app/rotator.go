@@ -61,7 +61,7 @@ func (r *RotatorDomain) BannerIDForSlot(ctx context.Context, slotID, socialID in
 
 	for i, s := range stats {
 		showsCount[i] = s.ShowCount
-		clicksCount[i] = s.ClickCount.Int64
+		clicksCount[i] = s.ClickCount
 	}
 
 	index := utils.PlayWithBandit(showsCount, clicksCount)

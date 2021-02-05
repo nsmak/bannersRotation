@@ -2,7 +2,6 @@ package app_test
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"testing"
 	"time"
@@ -151,34 +150,25 @@ func TestRotatorDomainSuite(t *testing.T) {
 func mockStatistics() []app.BannerSummary {
 	return []app.BannerSummary{
 		{
-			BannerID:  1,
-			SlotID:    1,
-			SocialID:  1,
-			ShowCount: 6,
-			ClickCount: sql.NullInt64{
-				Int64: 1,
-				Valid: true,
-			},
+			BannerID:   1,
+			SlotID:     1,
+			SocialID:   1,
+			ShowCount:  6,
+			ClickCount: 1,
 		},
 		{
-			BannerID:  2,
-			SlotID:    1,
-			SocialID:  1,
-			ShowCount: 7,
-			ClickCount: sql.NullInt64{
-				Int64: 2,
-				Valid: true,
-			},
+			BannerID:   2,
+			SlotID:     1,
+			SocialID:   1,
+			ShowCount:  7,
+			ClickCount: 2,
 		},
 		{
-			BannerID:  3,
-			SlotID:    1,
-			SocialID:  1,
-			ShowCount: 5,
-			ClickCount: sql.NullInt64{
-				Int64: 1,
-				Valid: true,
-			},
+			BannerID:   3,
+			SlotID:     1,
+			SocialID:   1,
+			ShowCount:  5,
+			ClickCount: 1,
 		},
 	}
 }

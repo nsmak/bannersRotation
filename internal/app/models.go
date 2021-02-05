@@ -1,7 +1,5 @@
 package app
 
-import "database/sql"
-
 type Slot struct {
 	ID          int64  `json:"id"`
 	Description string `json:"description"`
@@ -18,11 +16,11 @@ type SocialGroup struct {
 }
 
 type BannerSummary struct {
-	BannerID   int64         `db:"banner_id"`
-	SlotID     int64         `db:"slot_id"`
-	SocialID   int64         `db:"social_id"`
-	ShowCount  int64         `db:"show_count"`
-	ClickCount sql.NullInt64 `db:"click_count"`
+	BannerID   int64 `db:"banner_id"`
+	SlotID     int64 `db:"slot_id"`
+	SocialID   int64 `db:"social_id"`
+	ShowCount  int64 `db:"show_count"`
+	ClickCount int64 `db:"click_count"`
 }
 
 type BannerStatistic struct {

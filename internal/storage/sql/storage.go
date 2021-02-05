@@ -2,6 +2,7 @@ package sql
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 
@@ -91,10 +92,8 @@ func (s *BannerDataStore) RemoveBannerFromSlot(ctx context.Context, bannerID, sl
 }
 
 func (s *BannerDataStore) BannersStatistics(ctx context.Context, slotID, socialID int64) ([]app.BannerSummary, error) {
-	var stats []app.BannerSummary
-	err := s.db.SelectContext(
+	rows, err := s.db.QueryxContext(
 		ctx,
-		&stats,
 		`SELECT sh.banner_id, sh.slot_id, sh.social_id, count(sh.*) show_count, cl.count click_count
 			FROM banner_showing sh
 			LEFT JOIN (SELECT banner_id, slot_id, social_id, count(date) FROM banner_click GROUP BY 1,2,3) cl
@@ -106,6 +105,20 @@ func (s *BannerDataStore) BannersStatistics(ctx context.Context, slotID, socialI
 	)
 	if err != nil {
 		return nil, storage.NewError("can't get statistics", err)
+	}
+	defer rows.Close()
+
+	var stats []app.BannerSummary
+	for rows.Next() {
+		var summary app.BannerSummary
+		var clickCount sql.NullInt64
+
+		err := rows.Scan(&summary.BannerID, &summary.SlotID, &summary.SocialID, &summary.ShowCount, &clickCount)
+		if err != nil {
+			return nil, err
+		}
+		summary.ClickCount = clickCount.Int64
+		stats = append(stats, summary)
 	}
 
 	if len(stats) == 0 {
