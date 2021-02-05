@@ -65,7 +65,7 @@ func (s *Server) Stop(ctx context.Context) error {
 func (s *Server) router() *mux.Router {
 	router := mux.NewRouter()
 	for _, r := range s.public.Routes() {
-		handler := alice.New(s.loggingMiddleware).ThenFunc(r.Func)
+		handler := alice.New(s.panicMiddleware, s.loggingMiddleware).ThenFunc(r.Func)
 		router.
 			Methods(r.Method).
 			Path(r.Path).
