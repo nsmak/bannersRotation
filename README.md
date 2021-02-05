@@ -37,8 +37,7 @@ $ make build-statistic
     "file_path": "./zap.log"
   },
   "rest_server": {
-    "host": "rotator",
-    "port": "8888"
+    "address": "rotator:8888"
   },
   "database": {
     "username": "postgres",
@@ -54,8 +53,7 @@ $ make build-statistic
 ``` json 
 {
   "rabbit_mq": {
-    "host": "mq",
-    "port": "5672",
+    "address": "mq:5672",
     "username": "guest",
     "password": "guest",
     "exchange_name": "stat_exchange",
