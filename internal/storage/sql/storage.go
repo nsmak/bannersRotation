@@ -115,10 +115,15 @@ func (s *BannerDataStore) BannersStatistics(ctx context.Context, slotID, socialI
 
 		err := rows.Scan(&summary.BannerID, &summary.SlotID, &summary.SocialID, &summary.ShowCount, &clickCount)
 		if err != nil {
-			return nil, err
+			return nil, storage.NewError("scan error", err)
 		}
 		summary.ClickCount = clickCount.Int64
 		stats = append(stats, summary)
+	}
+
+	err = rows.Err()
+	if err != nil {
+		return nil, storage.NewError("rows error", err)
 	}
 
 	if len(stats) == 0 {
