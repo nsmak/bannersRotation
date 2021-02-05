@@ -6,10 +6,15 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/jackc/pgconn"
 	_ "github.com/jackc/pgx/v4/stdlib" // nolint: gci
 	"github.com/jmoiron/sqlx"
 	"github.com/nsmak/bannersRotation/internal/app"
 	"github.com/nsmak/bannersRotation/internal/storage"
+)
+
+const (
+	violatesForeignKeyConstraintCode = "23503"
 )
 
 type BannerDataStore struct {
@@ -36,33 +41,6 @@ func (s *BannerDataStore) Close() error {
 }
 
 func (s *BannerDataStore) AddBannerToSlot(ctx context.Context, bannerID, slotID int64) error {
-	bannerInSlotExist, err := s.bannerIsExistInSlot(ctx, bannerID, slotID)
-	if err != nil {
-		return storage.NewError("can't get info about banner in slot", err)
-	}
-
-	if bannerInSlotExist {
-		return storage.ErrBannerInSlotAlreadyExist
-	}
-
-	bannerIsExist, err := s.bannerIsExist(ctx, bannerID)
-	if err != nil {
-		return storage.NewError("can't get info about banner", err)
-	}
-
-	if !bannerIsExist {
-		return storage.ErrBannerNotFound
-	}
-
-	slotIsExist, err := s.slotIsExist(ctx, slotID)
-	if err != nil {
-		return storage.NewError("can't get info about slot", err)
-	}
-
-	if !slotIsExist {
-		return storage.ErrSlotNotFound
-	}
-
 	tx, err := s.db.BeginTxx(ctx, nil)
 	if err != nil {
 		return storage.NewError("can't start transactions", err)
@@ -71,6 +49,13 @@ func (s *BannerDataStore) AddBannerToSlot(ctx context.Context, bannerID, slotID 
 
 	_, err = tx.ExecContext(ctx, "INSERT INTO banner_slot (banner_id, slot_id) VALUES ($1, $2)", bannerID, slotID)
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == violatesForeignKeyConstraintCode {
+				return storage.NewError(pgErr.Error(), storage.ErrObjectNotFound)
+			}
+		}
+
 		return storage.NewError("can't add banner into slot", err)
 	}
 
@@ -98,25 +83,7 @@ func (s *BannerDataStore) AddBannerToSlot(ctx context.Context, bannerID, slotID 
 }
 
 func (s *BannerDataStore) RemoveBannerFromSlot(ctx context.Context, bannerID, slotID int64) error {
-	slotIsExist, err := s.slotIsExist(ctx, slotID)
-	if err != nil {
-		return storage.NewError("can't get info about slot", err)
-	}
-
-	if !slotIsExist {
-		return storage.ErrSlotNotFound
-	}
-
-	bannerIsExist, err := s.bannerIsExistInSlot(ctx, bannerID, slotID)
-	if err != nil {
-		return storage.NewError("can't get info about banner in slot", err)
-	}
-
-	if !bannerIsExist {
-		return storage.ErrBannerInSlotNotFound
-	}
-
-	_, err = s.db.ExecContext(ctx, "DELETE FROM banner_slot WHERE banner_id=$1 AND slot_id=$2", bannerID, slotID)
+	_, err := s.db.ExecContext(ctx, "DELETE FROM banner_slot WHERE banner_id=$1 AND slot_id=$2", bannerID, slotID)
 	if err != nil {
 		return storage.NewError("can't remove banner from slot", err)
 	}
@@ -125,28 +92,8 @@ func (s *BannerDataStore) RemoveBannerFromSlot(ctx context.Context, bannerID, sl
 }
 
 func (s *BannerDataStore) BannersStatistics(ctx context.Context, slotID, socialID int64) ([]app.BannerSummary, error) {
-	slotIsExist, err := s.slotIsExist(ctx, slotID)
-	if err != nil {
-		return nil, storage.NewError("can't get info about slot", err)
-	}
-
-	if !slotIsExist {
-		return nil, storage.ErrSlotNotFound
-	}
-
-	socialIsExist, err := s.socialGroupIsExist(ctx, socialID)
-	if err != nil {
-		return nil, storage.NewError("can't get info about social group", err)
-	}
-
-	if !socialIsExist {
-		return nil, storage.ErrSocialGroupNotFound
-	}
-
-	var stats []app.BannerSummary
-	err = s.db.SelectContext(
+	rows, err := s.db.QueryxContext(
 		ctx,
-		&stats,
 		`SELECT sh.banner_id, sh.slot_id, sh.social_id, count(sh.*) show_count, cl.count click_count
 			FROM banner_showing sh
 			LEFT JOIN (SELECT banner_id, slot_id, social_id, count(date) FROM banner_click GROUP BY 1,2,3) cl
@@ -159,9 +106,23 @@ func (s *BannerDataStore) BannersStatistics(ctx context.Context, slotID, socialI
 	if err != nil {
 		return nil, storage.NewError("can't get statistics", err)
 	}
+	defer rows.Close()
+
+	var stats []app.BannerSummary
+	for rows.Next() {
+		var summary app.BannerSummary
+		var clickCount sql.NullInt64
+
+		err := rows.Scan(&summary.BannerID, &summary.SlotID, &summary.SocialID, &summary.ShowCount, &clickCount)
+		if err != nil {
+			return nil, err
+		}
+		summary.ClickCount = clickCount.Int64
+		stats = append(stats, summary)
+	}
 
 	if len(stats) == 0 {
-		return nil, storage.ErrStatisticsNotFound
+		return nil, storage.ErrObjectNotFound
 	}
 
 	return stats, nil
@@ -181,39 +142,19 @@ func (s *BannerDataStore) AddViewForBanner(ctx context.Context, bannerID, slotID
 }
 
 func (s *BannerDataStore) AddClickForBanner(ctx context.Context, bannerID, slotID, socialID int64) error {
-	slotIsExist, err := s.slotIsExist(ctx, slotID)
-	if err != nil {
-		return storage.NewError("can't get info about slot", err)
-	}
-
-	if !slotIsExist {
-		return storage.ErrSlotNotFound
-	}
-
-	bannerIsExist, err := s.bannerIsExistInSlot(ctx, bannerID, slotID)
-	if err != nil {
-		return storage.NewError("can't get info about banner in slot", err)
-	}
-
-	if !bannerIsExist {
-		return storage.ErrBannerInSlotNotFound
-	}
-
-	socialIsExist, err := s.socialGroupIsExist(ctx, socialID)
-	if err != nil {
-		return storage.NewError("can't get info about social group", err)
-	}
-
-	if !socialIsExist {
-		return storage.ErrSocialGroupNotFound
-	}
-
-	_, err = s.db.ExecContext(
+	_, err := s.db.ExecContext(
 		ctx,
 		"INSERT INTO banner_click (banner_id, slot_id, social_id, date) VALUES ($1, $2, $3, current_timestamp)",
 		bannerID, slotID, socialID,
 	)
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) {
+			if pgErr.Code == violatesForeignKeyConstraintCode {
+				return storage.NewError(pgErr.Error(), storage.ErrObjectNotFound)
+			}
+		}
+
 		return storage.NewError("can't add view for banner", err)
 	}
 
@@ -262,63 +203,4 @@ func (s *BannerDataStore) socialGroups(ctx context.Context) ([]app.SocialGroup, 
 	}
 
 	return groups, nil
-}
-
-func (s *BannerDataStore) bannerIsExist(ctx context.Context, bannerID int64) (bool, error) {
-	var count int
-
-	err := s.db.GetContext(ctx, &count, "SELECT  COUNT(*) FROM banner WHERE id=$1", bannerID)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return false, nil
-		}
-		return false, storage.NewError("can't get exist info about banner", err)
-	}
-
-	return count > 0, nil
-}
-
-func (s *BannerDataStore) slotIsExist(ctx context.Context, slotID int64) (bool, error) {
-	var count int
-
-	err := s.db.GetContext(ctx, &count, "SELECT  COUNT(*) FROM slot WHERE id=$1", slotID)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return false, nil
-		}
-		return false, storage.NewError("can't get exist info about slot", err)
-	}
-
-	return count > 0, nil
-}
-
-func (s *BannerDataStore) bannerIsExistInSlot(ctx context.Context, bannerID, slotID int64) (bool, error) {
-	var count int
-
-	err := s.db.GetContext(
-		ctx,
-		&count, "SELECT COUNT(*) FROM banner_slot WHERE banner_id=$1 AND slot_id=$2", bannerID, slotID,
-	)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return false, nil
-		}
-		return false, storage.NewError("can't get exist info about banner in slot", err)
-	}
-
-	return count > 0, nil
-}
-
-func (s *BannerDataStore) socialGroupIsExist(ctx context.Context, socialID int64) (bool, error) {
-	var count int
-
-	err := s.db.GetContext(ctx, &count, "SELECT  COUNT(*) FROM social_dem WHERE id=$1", socialID)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return false, nil
-		}
-		return false, storage.NewError("can't get exist info about social group", err)
-	}
-
-	return count > 0, nil
 }

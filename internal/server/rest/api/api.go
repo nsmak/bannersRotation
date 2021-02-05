@@ -44,10 +44,10 @@ func (a *API) addBannerToSlot(w http.ResponseWriter, r *http.Request) {
 
 	if err := a.rotator.AddBannerToSlot(r.Context(), form.BannerID, form.SlotID); err != nil {
 		statusCode := http.StatusBadRequest
-		if errors.Is(err, storage.ErrBannerNotFound) || errors.Is(err, storage.ErrSlotNotFound) {
+		if errors.Is(err, storage.ErrObjectNotFound) {
 			statusCode = http.StatusNotFound
 		}
-		rest.SendErrorJSON(w, r, statusCode, err, "can't update event")
+		rest.SendErrorJSON(w, r, statusCode, err, "")
 		return
 	}
 
@@ -63,10 +63,10 @@ func (a *API) removeBannerFromSlot(w http.ResponseWriter, r *http.Request) {
 
 	if err := a.rotator.RemoveBannerFromSlot(r.Context(), form.BannerID, form.SlotID); err != nil {
 		statusCode := http.StatusBadRequest
-		if errors.Is(err, storage.ErrSlotNotFound) || errors.Is(err, storage.ErrBannerInSlotNotFound) {
+		if errors.Is(err, storage.ErrObjectNotFound) {
 			statusCode = http.StatusNotFound
 		}
-		rest.SendErrorJSON(w, r, statusCode, err, "can't update event")
+		rest.SendErrorJSON(w, r, statusCode, err, "")
 		return
 	}
 
@@ -83,8 +83,7 @@ func (a *API) bannerForSlot(w http.ResponseWriter, r *http.Request) {
 	bannerID, err := a.rotator.BannerIDForSlot(r.Context(), query.SlotID, query.SocDemID)
 	if err != nil {
 		statusCode := http.StatusBadRequest
-		if errors.Is(err, storage.ErrSlotNotFound) || errors.Is(err, storage.ErrSocialGroupNotFound) ||
-			errors.Is(err, storage.ErrStatisticsNotFound) {
+		if errors.Is(err, storage.ErrObjectNotFound) {
 			statusCode = http.StatusNotFound
 		}
 		rest.SendErrorJSON(w, r, statusCode, err, "can't get banner id")
@@ -104,11 +103,10 @@ func (a *API) addCLickForBanner(w http.ResponseWriter, r *http.Request) {
 	err := a.rotator.AddClickForBanner(r.Context(), form.BannerID, form.SlotID, form.SocDemID)
 	if err != nil {
 		statusCode := http.StatusBadRequest
-		if errors.Is(err, storage.ErrSlotNotFound) || errors.Is(err, storage.ErrBannerInSlotNotFound) ||
-			errors.Is(err, storage.ErrSocialGroupNotFound) {
+		if errors.Is(err, storage.ErrObjectNotFound) {
 			statusCode = http.StatusNotFound
 		}
-		rest.SendErrorJSON(w, r, statusCode, err, "can't get banner id")
+		rest.SendErrorJSON(w, r, statusCode, err, "")
 		return
 	}
 

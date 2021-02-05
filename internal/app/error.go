@@ -11,6 +11,7 @@ func (e *BaseError) Error() string {
 	}
 	return e.Message
 }
+
 func (e *BaseError) Unwrap() error {
 	return e.Err
 }

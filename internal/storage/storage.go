@@ -3,12 +3,7 @@ package storage
 import "github.com/nsmak/bannersRotation/internal/app"
 
 var (
-	ErrBannerNotFound           = NewError("banner not found", nil)
-	ErrSlotNotFound             = NewError("slot not found", nil)
-	ErrBannerInSlotNotFound     = NewError("banner in slot not found", nil)
-	ErrBannerInSlotAlreadyExist = NewError("banner in slot already exist", nil)
-	ErrSocialGroupNotFound      = NewError("social group not found", nil)
-	ErrStatisticsNotFound       = NewError("statistics not found", nil)
+	ErrObjectNotFound = NewError("object not found", nil)
 )
 
 type Error struct {
