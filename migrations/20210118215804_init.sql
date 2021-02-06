@@ -1,25 +1,25 @@
 -- +goose Up
 CREATE TABLE IF NOT EXISTS banner (
-    id numeric(5) NOT NULL,
+    id serial NOT NULL,
     description text NOT NULL DEFAULT '',
     PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS slot (
-    id numeric(5) NOT NULL,
+    id serial NOT NULL,
     description text NOT NULL DEFAULT '',
     PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS social_dem (
-    id numeric(5) NOT NULL,
+    id serial NOT NULL,
     description text NOT NULL DEFAULT '',
     PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS banner_slot (
-    banner_id numeric(5) NOT NULL,
-    slot_id numeric(5) NOT NULL,
+    banner_id serial NOT NULL,
+    slot_id serial NOT NULL,
     PRIMARY KEY (banner_id, slot_id),
     FOREIGN KEY (banner_id)
         REFERENCES banner (id),
@@ -28,9 +28,9 @@ CREATE TABLE IF NOT EXISTS banner_slot (
 );
 
 CREATE TABLE IF NOT EXISTS banner_showing (
-    banner_id numeric(5) NOT NULL,
-    slot_id numeric(5) NOT NULL,
-    social_id numeric(5) NOT NULL,
+    banner_id serial NOT NULL,
+    slot_id serial NOT NULL,
+    social_id serial NOT NULL,
     date timestamptz NOT NULL DEFAULT current_timestamp,
     PRIMARY KEY (banner_id, slot_id, social_id, date),
     FOREIGN KEY (banner_id)
@@ -42,9 +42,9 @@ CREATE TABLE IF NOT EXISTS banner_showing (
 );
 
 CREATE TABLE IF NOT EXISTS banner_click (
-    banner_id numeric(5) NOT NULL,
-    slot_id numeric(5) NOT NULL,
-    social_id numeric(5) NOT NULL,
+    banner_id serial NOT NULL,
+    slot_id serial NOT NULL,
+    social_id serial NOT NULL,
     date timestamptz NOT NULL DEFAULT current_timestamp,
     PRIMARY KEY (banner_id, slot_id, social_id, date),
     FOREIGN KEY (banner_id)
